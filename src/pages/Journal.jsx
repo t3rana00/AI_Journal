@@ -1,5 +1,4 @@
 import { useState } from "react";
-import MoodBadge from "../components/MoodBadge";
 import { generateFromNotes } from "../utils/ai";
 import { saveEntry } from "../utils/storage";
 
@@ -13,7 +12,7 @@ export default function Journal() {
     setResult(r);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!result?.entry) return;
     setSaving(true);
     saveEntry({
@@ -26,44 +25,38 @@ export default function Journal() {
     setSaving(false);
     setNotes("");
     setResult(null);
-    alert("Saved to your journal ✨");
+    alert("✅ Entry saved!");
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h2 className="text-2xl font-semibold mb-4">Write about your day</h2>
+    <div>
+      <h2 className="mb-4 text-primary text-center">📝 Write About Your Day</h2>
 
-      <div className="journal-page">
+      <div className="journal-page mb-3">
         <textarea
-          className="w-full h-64 bg-transparent outline-none journal-text"
-          placeholder="e.g., had a tough exam but coffee with friends helped..."
+          className="form-control border-0 bg-transparent"
+          rows="8"
+          placeholder="Type your thoughts…"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
         />
       </div>
 
-      <div className="flex gap-3 mt-4">
-        <button onClick={handleGenerate} className="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700">
-          Generate with AI (mock)
+      <div className="d-flex justify-content-center gap-3">
+        <button onClick={handleGenerate} className="btn btn-primary">
+          ✨ Generate Entry
         </button>
-        <button
-          onClick={handleSave}
-          disabled={!result?.entry || saving}
-          className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50"
-        >
-          {saving ? "Saving..." : "Save Entry"}
+        <button onClick={handleSave} className="btn btn-success" disabled={!result?.entry || saving}>
+          {saving ? "Saving…" : "💾 Save"}
         </button>
       </div>
 
       {result && (
-        <div className="mt-6 p-5 rounded-xl border bg-white">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold">Polished Entry</h3>
-            <MoodBadge mood={result.mood} />
-          </div>
-          <p className="text-gray-800 leading-7">{result.entry}</p>
-          <div className="mt-4 text-sm text-gray-600">
-            <span className="font-medium">Suggestion for tomorrow:</span> {result.suggestion}
+        <div className="card mt-4 border-primary-subtle shadow-sm">
+          <div className="card-body">
+            <h5 className="card-title text-primary">Your Polished Entry</h5>
+            <p className="card-text">{result.entry}</p>
+            <p className="text-muted mb-0"><strong>💡 Tip for Tomorrow:</strong> {result.suggestion}</p>
           </div>
         </div>
       )}

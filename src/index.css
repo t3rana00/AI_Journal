@@ -1,18 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-
-
-/* notebook feel */
-.journal-page {
-  background: repeating-linear-gradient(white, white 28px, #d7dce0 29px);
-  box-shadow: 0 8px 24px rgba(0,0,0,.08);
-  border-radius: 16px;
-  padding: 20px;
+/* Full-page soft gradient */
+html, body, #root {
+  height: 100%;
 }
-.journal-text {
-  font-family: "Patrick Hand", cursive;
-  font-size: 1.15rem;
-  line-height: 1.9;
+
+body {
+  background: linear-gradient(
+    135deg,
+    #fdf2f8 0%,  /* very light pink */
+    #e0f2fe 50%, /* very light sky */
+    #ede9fe 100% /* very light violet */
+  );
+  min-height: 100vh;
+}
+
+/* lined notebook look for the textarea wrapper */
+.journal-page {
+  background:
+    linear-gradient(white, white) padding-box,
+    linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.8)) border-box,
+    repeating-linear-gradient(white, white 28px, #e5e7eb 29px);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 }
