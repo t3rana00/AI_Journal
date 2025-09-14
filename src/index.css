@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+/* notebook feel */
+.journal-page {
+  background: repeating-linear-gradient(white, white 28px, #d7dce0 29px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.08);
+  border-radius: 16px;
+  padding: 20px;
+}
+.journal-text {
+  font-family: "Patrick Hand", cursive;
+  font-size: 1.15rem;
+  line-height: 1.9;
+}
