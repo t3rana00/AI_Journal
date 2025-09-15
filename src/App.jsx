@@ -6,6 +6,7 @@ import { auth } from "./firebase";
 import Home from "./pages/Home";
 import Journal from "./pages/Journal";
 import History from "./pages/History";
+import Tasks from "./pages/Tasks";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 
@@ -13,7 +14,7 @@ export default function App() {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const navigate = useNavigate();
 
-  // Listen for auth state changes (keeps user logged in after refresh)
+  // Listen for Firebase Auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -66,6 +67,7 @@ export default function App() {
                 <>
                   <li className="nav-item"><Link className="nav-link" to="/journal">Journal</Link></li>
                   <li className="nav-item"><Link className="nav-link" to="/history">History</Link></li>
+                  <li className="nav-item"><Link className="nav-link" to="/tasks">Tasks</Link></li>
                   <li className="nav-item">
                     <button onClick={handleLogout} className="btn btn-link nav-link text-danger">
                       Logout
@@ -78,16 +80,36 @@ export default function App() {
         </div>
       </nav>
 
-      {/* Main */}
+      {/* Main Content */}
       <main className="flex-grow-1 py-5">
         <div className="container">
           <div className="card shadow-sm p-4" style={{ background: "rgba(255,255,255,0.88)", borderRadius: 16 }}>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/login" element={!loggedInUser ? <Login onLogin={(user) => setLoggedInUser(user)} /> : <Navigate to="/journal" />} />
-              <Route path="/signup" element={!loggedInUser ? <Signup /> : <Navigate to="/journal" />} />
-              <Route path="/journal" element={loggedInUser ? <Journal user={loggedInUser} onLogout={handleLogout} /> : <Navigate to="/login" />} />
-              <Route path="/history" element={loggedInUser ? <History /> : <Navigate to="/login" />} />
+
+              {/* Auth Pages */}
+              <Route
+                path="/login"
+                element={!loggedInUser ? <Login onLogin={(user) => setLoggedInUser(user)} /> : <Navigate to="/journal" />}
+              />
+              <Route
+                path="/signup"
+                element={!loggedInUser ? <Signup /> : <Navigate to="/journal" />}
+              />
+
+              {/* Protected Routes */}
+              <Route
+                path="/journal"
+                element={loggedInUser ? <Journal user={loggedInUser} onLogout={handleLogout} /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/history"
+                element={loggedInUser ? <History /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/tasks"
+                element={loggedInUser ? <Tasks /> : <Navigate to="/login" />}
+              />
             </Routes>
           </div>
         </div>
@@ -96,7 +118,7 @@ export default function App() {
       {/* Footer */}
       <footer className="bg-white text-center py-3 border-top">
         <small className="text-muted">
-          © {new Date().getFullYear()} Nadeesha’s AI Journal — Firebase + React
+          © {new Date().getFullYear()} Nadeesha’s AI Journal — Firebase + React + Firestore
         </small>
       </footer>
     </div>
