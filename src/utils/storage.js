@@ -1,23 +1,61 @@
-const KEY = "aiJournal.entries";
+import { db, auth } from "../firebase";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
-export function getEntries() {
-  try { return JSON.parse(localStorage.getItem(KEY)) ?? []; }
-  catch { return []; }
+const COLLECTION = "entries";
+
+export async function getEntries() {
+  try {
+    if (!auth.currentUser) return [];
+    const q = query(collection(db, COLLECTION), where("user", "==", auth.currentUser.email));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data(),
+    }));
+  } catch (error) {
+    console.error("Error fetching entries:", error);
+    return [];
+  }
 }
 
-export function saveEntry(entry) {
-  const all = getEntries();
-  const withId = { id: crypto.randomUUID?.() || String(Date.now()), ...entry };
-  all.unshift(withId);
-  localStorage.setItem(KEY, JSON.stringify(all));
-  return withId;
+export async function saveEntry(entry) {
+  try {
+    if (!auth.currentUser) throw new Error("User not logged in");
+    const docRef = await addDoc(collection(db, COLLECTION), {
+      user: auth.currentUser.email,
+      ...entry,
+    });
+    return { id: docRef.id, ...entry };
+  } catch (error) {
+    console.error("Error saving entry:", error);
+    return null;
+  }
 }
 
-export function deleteEntry(id) {
-  const all = getEntries().filter(e => e.id !== id);
-  localStorage.setItem(KEY, JSON.stringify(all));
+export async function deleteEntry(id) {
+  try {
+    await deleteDoc(doc(db, COLLECTION, id));
+  } catch (error) {
+    console.error("Error deleting entry:", error);
+  }
 }
 
-export function clearAll() {
-  localStorage.removeItem(KEY);
+export async function clearAll() {
+  try {
+    if (!auth.currentUser) return;
+    const q = query(collection(db, COLLECTION), where("user", "==", auth.currentUser.email));
+    const snapshot = await getDocs(q);
+    const deletions = snapshot.docs.map((docSnap) => deleteDoc(docSnap.ref));
+    await Promise.all(deletions);
+  } catch (error) {
+    console.error("Error clearing entries:", error);
+  }
 }

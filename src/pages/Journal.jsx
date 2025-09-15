@@ -2,7 +2,7 @@ import { useState } from "react";
 import { generateFromNotes } from "../utils/ai";
 import { saveEntry } from "../utils/storage";
 
-export default function Journal() {
+export default function Journal({ user, onLogout }) {
   const [notes, setNotes] = useState("");
   const [result, setResult] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -30,7 +30,17 @@ export default function Journal() {
 
   return (
     <div>
-      <h2 className="mb-4 text-primary text-center">📝 Write About Your Day</h2>
+      {/* Added greeting + logout button */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2 className="mb-0 text-primary">
+          📝 Write About Your Day {user && `— Welcome, ${user}`}
+        </h2>
+        {onLogout && (
+          <button onClick={onLogout} className="btn btn-outline-danger btn-sm">
+            Logout
+          </button>
+        )}
+      </div>
 
       <div className="journal-page mb-3">
         <textarea
@@ -46,7 +56,11 @@ export default function Journal() {
         <button onClick={handleGenerate} className="btn btn-primary">
           ✨ Generate Entry
         </button>
-        <button onClick={handleSave} className="btn btn-success" disabled={!result?.entry || saving}>
+        <button
+          onClick={handleSave}
+          className="btn btn-success"
+          disabled={!result?.entry || saving}
+        >
           {saving ? "Saving…" : "💾 Save"}
         </button>
       </div>
@@ -56,7 +70,9 @@ export default function Journal() {
           <div className="card-body">
             <h5 className="card-title text-primary">Your Polished Entry</h5>
             <p className="card-text">{result.entry}</p>
-            <p className="text-muted mb-0"><strong>💡 Tip for Tomorrow:</strong> {result.suggestion}</p>
+            <p className="text-muted mb-0">
+              <strong>💡 Tip for Tomorrow:</strong> {result.suggestion}
+            </p>
           </div>
         </div>
       )}
