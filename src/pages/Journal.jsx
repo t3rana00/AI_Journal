@@ -2,58 +2,105 @@ import { useState } from "react";
 import { generateFromNotes } from "../utils/ai";
 import { saveEntry } from "../utils/storage";
 
-export default function Journal({ user, onLogout }) {
+const today = new Date().toLocaleDateString("en-US", {
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+
+export default function Journal({ user }) {
   const [notes, setNotes] = useState("");
   const [result, setResult] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [alert, setAlert] = useState(null); // ✅ for showing success/error
 
   const handleGenerate = async () => {
-    const r = await generateFromNotes(notes);
-    setResult(r);
+    if (!notes.trim()) return;
+    try {
+      console.log("Generating entry from notes:", notes);
+      const r = await generateFromNotes(notes);
+      console.log("AI generated result:", r);
+      setResult(r);
+    } catch (error) {
+      console.error("❌ Error generating entry:", error);
+      setAlert({ type: "danger", message: "Failed to generate entry. Try again." });
+    }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!result?.entry) return;
     setSaving(true);
-    saveEntry({
-      date: new Date().toISOString(),
-      raw: notes.trim(),
-      polished: result.entry,
-      mood: result.mood,
-      suggestion: result.suggestion,
-    });
-    setSaving(false);
-    setNotes("");
-    setResult(null);
-    alert("✅ Entry saved!");
+    try {
+      console.log("Saving entry to Firestore...");
+      const docId = await saveEntry({
+        date: new Date().toISOString(),
+        raw: notes.trim(),
+        polished: result.entry,
+        mood: result.mood,
+        suggestion: result.suggestion,
+      });
+      console.log("✅ Entry saved with ID:", docId);
+      setAlert({ type: "success", message: "Entry saved successfully!" });
+
+      // Reset form
+      setNotes("");
+      setResult(null);
+    } catch (error) {
+      console.error("❌ Error saving entry:", error);
+      setAlert({ type: "danger", message: "Failed to save entry. Check console." });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div>
-      {/* Added greeting + logout button */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0 text-primary">
-          📝 Write About Your Day {user && `— Welcome, ${user}`}
-        </h2>
-        {onLogout && (
-          <button onClick={onLogout} className="btn btn-outline-danger btn-sm">
-            Logout
-          </button>
-        )}
+    <div className="journal-container">
+      {/* Alert Notification */}
+      {alert && (
+        <div
+          className={`alert alert-${alert.type} alert-dismissible fade show`}
+          role="alert"
+        >
+          {alert.message}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setAlert(null)}
+          ></button>
+        </div>
+      )}
+
+      {/* Date Header */}
+      <div className="journal-header">
+        <h2>📅 {today}</h2>
+        <p className="welcome-text">
+          {user ? `Welcome back, ${user}!` : "Write about your day below."}
+        </p>
       </div>
 
-      <div className="journal-page mb-3">
-        <textarea
-          className="form-control border-0 bg-transparent"
-          rows="8"
-          placeholder="Type your thoughts…"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-        />
+      {/* Journal Page */}
+      <div className="journal-page-with-tape">
+        <div className="washi-tape top"></div>
+        <div className="journal-page">
+          <textarea
+            className="journal-textarea"
+            rows="8"
+            placeholder="Dear Journal..."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          />
+        </div>
+        <div className="washi-tape bottom"></div>
       </div>
 
-      <div className="d-flex justify-content-center gap-3">
-        <button onClick={handleGenerate} className="btn btn-primary">
+      {/* Buttons */}
+      <div className="d-flex justify-content-center gap-3 mt-3">
+        <button
+          onClick={handleGenerate}
+          className="btn btn-primary"
+          disabled={!notes.trim()}
+        >
           ✨ Generate Entry
         </button>
         <button
@@ -65,8 +112,9 @@ export default function Journal({ user, onLogout }) {
         </button>
       </div>
 
+      {/* Polished Entry Display */}
       {result && (
-        <div className="card mt-4 border-primary-subtle shadow-sm">
+        <div className="card mt-4 border-primary-subtle shadow-sm journal-result">
           <div className="card-body">
             <h5 className="card-title text-primary">Your Polished Entry</h5>
             <p className="card-text">{result.entry}</p>

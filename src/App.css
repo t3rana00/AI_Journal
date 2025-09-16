@@ -1,42 +1,84 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+/* Import a handwriting font */
+@import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap");
+
+.journal-container {
+  background: #faf8f4;
   padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.journal-header h2 {
+  font-family: "Patrick Hand", cursive;
   text-align: center;
+  font-size: 1.8rem;
+  color: #5a4632;
+  margin-bottom: 0.3rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.welcome-text {
+  text-align: center;
+  color: #8b7a65;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Washi tape effect */
+.washi-tape {
+  width: 120px;
+  height: 24px;
+  background: repeating-linear-gradient(
+    45deg,
+    #ffb6c1,
+    #ffb6c1 8px,
+    #fff1f4 8px,
+    #fff1f4 16px
+  ); /* pink striped tape */
+  border-radius: 6px;
+  position: relative;
+  margin: 0 auto;
+  transform: rotate(-2deg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.washi-tape.bottom {
+  transform: rotate(2deg);
+  margin-top: -10px;
 }
 
-.card {
-  padding: 2em;
+.journal-page-with-tape {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
-.read-the-docs {
-  color: #888;
+.journal-page {
+  background: #fffdf9;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.journal-textarea {
+  width: 100%;
+  background: repeating-linear-gradient(
+    white,
+    white 28px,
+    #f4f1eb 29px
+  );
+  font-family: "Patrick Hand", cursive;
+  font-size: 1.2rem;
+  border: none;
+  outline: none;
+  resize: none;
+  line-height: 28px;
+}
+
+.journal-result {
+  background: #fffefa;
+  border-left: 5px solid #5a4632;
 }
